@@ -2,7 +2,7 @@
 
 require_once dirname(__FILE__) . '/../../vendor/autoload.php';
 
-class UserSubscriptionTest extends PHPUnit_Extensions_Selenium2TestCase {
+class LoginSetup extends PHPUnit_Extensions_Selenium2TestCase {
 
     public function setUp() {
         parent::setUp();
@@ -10,9 +10,10 @@ class UserSubscriptionTest extends PHPUnit_Extensions_Selenium2TestCase {
         $this->setPort(4444);
         $this->setBrowserUrl('http://shalomsoftware.com.au/pm/');
         $this->setBrowser('firefox');
-        
-        
-        //$this->setSeleniumServerRequestsTimeout(10000);
+    }
+
+    public function tearDown(){
+        $this->stop();
     }
 
     public function onNotSuccessfulTest($exception) {
@@ -23,24 +24,18 @@ class UserSubscriptionTest extends PHPUnit_Extensions_Selenium2TestCase {
         parent::onNotSuccessfulTest($exception);
     }
 
-    public function testIncorrectLogin() {
-        //$this->timeouts()->implicitWait(25000);
+    public function login() {
         $this->url('http://shalomsoftware.com.au/pm/index.php/user/login');
-        $this->assertEquals("Shalom Software Project Management Tool - Login", $this->title(), 'something wrong!!');
+        $this->byName('UserLogin[username]')->value('harlan');
+        $this->byName('UserLogin[password]')->value('sinky7');
 
-        $this->byName('UserLogin[username]')->value('admin');
-        $this->byName('UserLogin[password]')->value('test$123');
-        
 
         $this->waitForPageReload(function () {
             $this->byName('yt0')->click();
-        }, 5000);        
-
-        $this->assertContains("Password is incorrect", $this->source());
+        }, 5000);
     }
-    
-    
-    function waitForPageReload($navigate_f, $timeout) {
+
+    public function waitForPageReload($navigate_f, $timeout) {
 
         $id = $this->byCssSelector('body')->getId();
 
